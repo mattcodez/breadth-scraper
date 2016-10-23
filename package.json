@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/mattcodez/breadth-scraper/issues"
   },
-  "homepage": "https://github.com/mattcodez/breadth-scraper#readme"
+  "homepage": "https://github.com/mattcodez/breadth-scraper#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "knex": "^0.12.1",
+    "parse": "^1.9.2",
+    "request": "^2.75.0",
+    "request-promise-native": "^1.0.3"
+  }
 }
