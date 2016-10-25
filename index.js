@@ -11,17 +11,41 @@ const pg = require('knex')({
   searchPath: 'knex,public'
 });
 
-function captureDomains(domains){
-  const activeRequests = []; //TODO: maybe use a weakmap here
+function getNextDomainId(){
+  return pg.select('id')
+    .from('domains')
+    .rightOuterJoin('pages', 'domains.id', 'pages.domain')
+    .whereNull('pages.id')
+    .orderBy('domains.id', 'asc')
+    .limit(1)
+    .then(domain => {
+      const domain = domains[0];
+      return domain.id;
+    });
 }
 
-function captureDomain(){
+function startCapture(){
+  captureDomain(getNextDomainId())
+  .then(msg => {
+    console.log(msg);
+    //Capture next domain once we're all done with the previous
+    process.nextTick(startCapture); //Don't want infinite recursion
+  });
+}
+
+function pauseCapture(){
+
+}
+
+function captureDomain(domainId){
   //find page, if it doesn't exist, add domain as url
   return pg.select('id','domain','url')
     .from('pages')
-    .where('domain', 141644)
+    .where('domain', domainId)
     .then(pages => {
       const page = pages[0];
+
+      //Already have a row in "pages" for this id
       if (page){
         return capturePage({
           pageId:page.id,
@@ -52,7 +76,6 @@ function capturePage({pageId,url}){
       body: $('body').text()
     })
     .then(id => {
-      console.log('logged site', url);
       return `logged site ${url}`;
     });
   })

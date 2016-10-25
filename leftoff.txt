@@ -1,0 +1,1 @@
+10-24: -Finish removing references to reddit in the capture code

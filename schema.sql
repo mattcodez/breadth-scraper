@@ -17,6 +17,7 @@ CREATE TABLE domains (
   "domain"  VARCHAR(259) UNIQUE NOT NULL
 );
 
+-- We may try different URL's for a single domain
 CREATE TABLE pages (
   "id"      SERIAL PRIMARY KEY,
   "domain"  INT REFERENCES "domains",
