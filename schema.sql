@@ -18,6 +18,7 @@ CREATE TABLE domains (
 );
 
 -- We may try different URL's for a single domain
+-- Well, beyond that, most domains have tons of pages
 CREATE TABLE pages (
   "id"      SERIAL PRIMARY KEY,
   "domain"  INT REFERENCES "domains",

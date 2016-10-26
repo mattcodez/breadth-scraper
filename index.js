@@ -12,13 +12,13 @@ const pg = require('knex')({
 });
 
 function getNextDomainId(){
-  return pg.select('id')
+  return pg.select('domains.id')
     .from('domains')
     .rightOuterJoin('pages', 'domains.id', 'pages.domain')
     .whereNull('pages.id')
     .orderBy('domains.id', 'asc')
     .limit(1)
-    .then(domain => {
+    .then(domains => {
       const domain = domains[0];
       return domain.id;
     });
@@ -33,40 +33,49 @@ function startCapture(){
   });
 }
 
+startCapture(); //Temporary
+
 function pauseCapture(){
 
 }
 
-function captureDomain(domainId){
+//I'm thinking this won't be run after initial pages are filled
+//for a given domain, we would just pull based on "pages" then
+function captureDomain(domainId){console.log('domainId', domainId)
+  if (!domainId){
+    throw `domainId must be passed to captureDomain, got ${domainId}`;
+  }
   //find page, if it doesn't exist, add domain as url
-  return pg.select('id','domain','url')
+  return pg.select()
     .from('pages')
-    .where('domain', domainId)
+    .innerJoin('domains', 'domains.id', 'pages.domain')
+    .where('domains.id', domainId)
     .then(pages => {
       const page = pages[0];
 
       //Already have a row in "pages" for this id
       if (page){
         return capturePage({
-          pageId:page.id,
-          url:   page.url
+          pageId:page.pages.id,
+          url:   page.pages.url
         });
       }
       else {
+        const url = `http://www.${page.domains.domain}`;
         return pg('pages')
         .returning('id')
         .insert({
-          domain: 141644,
-          url: 'http://www.reddit.com'
+          domain: domainId,
+          url
         })
-        .then(id => capturePage({pageId:id[0], url:'http://www.reddit.com'}));
+        .then(id => capturePage({pageId:id[0], url}));
       }
     });
 }
 
 function capturePage({pageId,url}){
   return request({url, resolveWithFullResponse:true})
-  .then((res) => {
+  .then(res => {
     console.log(url + " Status code: " + res.statusCode);
 
     const $ = cheerio.load(res.body);

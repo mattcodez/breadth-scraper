@@ -1,1 +1,4 @@
+10-25: -We're passing a promise to captureDomain, need to fix that
+-Start switching to native async/await with Node 7
+-May want to start reading instructions from stdin
 10-24: -Finish removing references to reddit in the capture code
