@@ -1,3 +1,6 @@
+10-28: -first domain doesn't work, handle then move to next domain.
+  Technically there's no HTTP response for these so how to record? Need
+  new column?
 10-27: -captureDomain select() isn't returning the columns we need
 -Strip '.' at end of domains (add to cleaning function too)
 10-25: -We're passing a promise to captureDomain, need to fix that
