@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mattcodez/breadth-scraper#readme",
   "dependencies": {
     "cheerio": "^0.22.0",
+    "colors": "^1.1.2",
     "knex": "^0.12.1",
     "parse": "^1.9.2",
     "pg": "^6.1.0",

@@ -1,4 +1,5 @@
 "use strict";
+const colors = require('colors');
 const request = require('request-promise-native');
 const cheerio = require('cheerio');
 const parse = require('robots-txt-parse');
@@ -26,7 +27,7 @@ async function startCapture(){
   const msg = await captureDomain(nextDomainId);
   console.log('MSG', msg);
   //Capture next domain once we're all done with the previous
-  process.nextTick(startCapture); //Don't want infinite recursion
+  //process.nextTick(startCapture); //Don't want infinite call stack
 }
 
 startCapture(); //Temporary
@@ -37,7 +38,8 @@ function pauseCapture(){
 
 //I'm thinking this won't be run after initial pages are filled
 //for a given domain, we would just pull based on "pages" then
-async function captureDomain(domainId){console.log('domainId', domainId)
+async function captureDomain(domainId){
+  console.log('domainId'.blue, domainId)
   if (typeof(domainId) !== 'number'){
     throw `domainId [number] must be passed to captureDomain, got ${domainId}`;
   }
@@ -47,29 +49,30 @@ async function captureDomain(domainId){console.log('domainId', domainId)
     .rightOuterJoin('domains', 'domains.id', 'pages.domain')
     .where('domains.id', domainId);
   const page = pages[0];
-console.log('pages', pages);
+
   //Already have a row in "pages" for this id
-  if (page.pages.id === null){
+  if (page.id !== null){
     return capturePage({
-      pageId:page.pages.id,
-      url:   page.pages.url
+      pageId:page.id,
+      url:   page.url
     });
   }
   else {
-    const url = `http://www.${page.domains.domain}`;
+    const url = `http://www.${page.domain}`;
     let id = await pg('pages')
     .returning('id')
     .insert({
       domain: domainId,
       url
     });
-    capturePage({pageId:id[0], url});
+    return capturePage({pageId:id, url});
   }
 }
 
 async function capturePage({pageId,url}){
+  console.log('capturePage'.blue,pageId, url);
   try{
-    let res = await request({url, resolveWithFullResponse:true})
+    let res = await request({url, resolveWithFullResponse:true});
     console.log(url + " Status code: " + res.statusCode);
 
     const $ = cheerio.load(res.body);
