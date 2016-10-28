@@ -38,7 +38,9 @@ CREATE OR REPLACE FUNCTION add_domains_from_staging(OUT insertcount int)
 RETURNS int AS $$
 BEGIN
   INSERT INTO domains(domain)
-  SELECT domain FROM domain_staging
+  SELECT
+    TRIM(TRAILING '.' FROM domain) AS domain
+  FROM domain_staging
   ON CONFLICT DO NOTHING;
   GET DIAGNOSTICS insertcount = ROW_COUNT;
 END;
