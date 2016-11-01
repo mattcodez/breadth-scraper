@@ -1,3 +1,5 @@
+10-31: -Get stdin controls working to pause/resume capture loop
+-Let's set response_code to Null for domain not resolved.
 10-28: -first domain doesn't work, handle then move to next domain.
   Technically there's no HTTP response for these so how to record? Need
   new column?

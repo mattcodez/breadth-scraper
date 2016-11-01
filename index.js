@@ -59,12 +59,12 @@ async function captureDomain(domainId){
   }
   else {
     const url = `http://www.${page.domain}`;
-    let id = await pg('pages')
+    let id = (await pg('pages')
     .returning('id')
     .insert({
       domain: domainId,
       url
-    });
+    }))[0];
     return capturePage({pageId:id, url});
   }
 }
@@ -76,14 +76,24 @@ async function capturePage({pageId,url}){
     console.log(url + " Status code: " + res.statusCode);
 
     const $ = cheerio.load(res.body);
-    let id = await pg('pages_captures').insert({
+    await pg('pages_captures').insert({
       page: pageId,
       response_code: res.statusCode,
       body: $('body').text()
     });
-    return `logged site ${url} pages_captures: ${id}`;
+    return `logged site ${url}`;
   }
   catch(err){
-    console.error(err);
+    if (err.name === 'RequestError'){
+      await pg('pages_captures').insert({
+        page: pageId,
+        response_code: null,
+        body: null
+      });
+      return `site ${url} not found`;
+    }
+    else {
+      console.error(err);
+    }
   }
 }
