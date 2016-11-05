@@ -12,6 +12,19 @@ const pg = require('knex')({
   searchPath: 'knex,public'
 });
 
+const readline = require('readline');
+
+readline.emitKeypressEvents(process.stdin);
+process.stdin.setRawMode(true);
+
+process.stdin.on('keypress', (str, key) => {
+  if (key == 's') startCapture();
+  if (key == 'p') pauseCapture();
+});
+
+console.log('Press "s" to start capture, "p" to pause');
+
+//Capture code
 async function getNextDomainId(){
   let domains = await pg.select('domains.id')
     .from('domains')
@@ -22,18 +35,24 @@ async function getNextDomainId(){
   return domains[0].id;
 }
 
-async function startCapture(){
-  let nextDomainId = await getNextDomainId();
-  const msg = await captureDomain(nextDomainId);
-  console.log('MSG', msg);
+let capture_on = false;
+async function capture(){
+  if (capture_on){
+    let nextDomainId = await getNextDomainId();
+    const msg = await captureDomain(nextDomainId);
+    console.log('MSG', msg);
+  }
   //Capture next domain once we're all done with the previous
-  //process.nextTick(startCapture); //Don't want infinite call stack
+  process.nextTick(capture); //Don't want infinite call stack
+}
+capture(); //start main program loop
+
+function startCapture(){
+  capture_on = true;
 }
 
-startCapture(); //Temporary
-
 function pauseCapture(){
-
+  capture_on = false;
 }
 
 //I'm thinking this won't be run after initial pages are filled
