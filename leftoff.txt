@@ -1,3 +1,5 @@
+11-5: 
+Just try commenting out everything, don't know why this won't work.
 10-31: -Get stdin controls working to pause/resume capture loop
 -Let's set response_code to Null for domain not resolved.
 10-28: -first domain doesn't work, handle then move to next domain.

@@ -1,28 +1,51 @@
-"use strict";
-const colors = require('colors');
-const request = require('request-promise-native');
-const cheerio = require('cheerio');
-const parse = require('robots-txt-parse');
+//"use strict";
+//const colors = require('colors');
+//const request = require('request-promise-native');
+//const cheerio = require('cheerio');
+//const parse = require('robots-txt-parse');
 
-const MAX_CONCURRENT_REQUESTS = 3;
+//const MAX_CONCURRENT_REQUESTS = 3;
 
-const pg = require('knex')({
+/*const pg = require('knex')({
   client:     'pg',
   connection: process.env.PG_CONNECTION_STRING,
   searchPath: 'knex,public'
+});*/
+
+//const readline = require('readline');
+
+//readline.emitKeypressEvents(process.stdin);
+//if (process.stdin.isTTY){
+var stdin = process.stdin;
+  stdin.setRawMode(true);
+  stdin.resume();
+  stdin.setEncoding('utf8');
+//}
+
+stdin.on('data', function(key){
+  if (key == '\u001B\u005B\u0041') {
+      process.stdout.write('up');
+  }
+  if (key == '\u001B\u005B\u0043') {
+      process.stdout.write('right');
+  }
+  if (key == '\u001B\u005B\u0042') {
+      process.stdout.write('down');
+  }
+  if (key == '\u001B\u005B\u0044') {
+      process.stdout.write('left');
+  }
+
+  if (key == '\u0003') { process.exit(); }    // ctrl-c
 });
 
-const readline = require('readline');
-
-readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
-
-process.stdin.on('keypress', (str, key) => {
+/*process.stdin.on('keypress', (str, key) => {
+  process.stdout.write('KEYPRESS!'.green, str, key)
   if (key == 's') startCapture();
   if (key == 'p') pauseCapture();
-});
+});*/
 
-console.log('Press "s" to start capture, "p" to pause');
+//rocess.stdout.write('Press "s" to start capture, "p" to pause');
 
 //Capture code
 async function getNextDomainId(){
